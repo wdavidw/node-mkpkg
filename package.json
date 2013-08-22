@@ -1,0 +1,34 @@
+{
+  "name": "mkpkg",
+  "version": "0.3.5",
+  "description": "Make new Node.js packages easy.",
+  "homepage": "http://www.adaltas.com/projects/node-mkpkg/",
+  "bugs": "https://github.com/wdavidw/node-mkpkg/issues",
+  "author": "David Worms <david@adaltas.com> (http://www.adaltas.com)",
+  "contributors": [
+    "David Worms <david@adaltas.com> (http://www.adaltas.com)"
+  ],
+  "engines": {
+    "node": ">= 0.10"
+  },
+  "keywords": [
+    "make",
+    "package"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/wdavidw/node-mkpkg.git"
+  },
+  "dependencies": {
+    "git": "latest"
+  },
+  "devDependencies": {
+    "coffee-script": "latest",
+    "mocha": "latest",
+    "should": "latest"
+  },
+  "optionalDependencies": {},
+  "scripts": {
+    "test": "make test"
+  }
+}
