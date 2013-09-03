@@ -1,0 +1,4 @@
+#!/usr/bin/env coffee
+
+mkpkg = require '../lib/mkpkg'
+mkpkg exit: true
