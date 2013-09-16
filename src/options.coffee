@@ -50,22 +50,17 @@ module.exports =
     required: true
   ,
     name: 'git'
-    label: 'Is this a git repository'
+    label: 'Is this a GIT repository'
     type: 'boolean'
     default: true
   ,
     name: 'github'
-    label: 'GitHub url'
+    label: 'GitHub URL'
     if: (answers) -> answers.git
     match: [
       /\w+@github.com:(.*)\/(.*)\.git/
       /\w+:\/\/github.com\/(.*)\/(.*)\.git/
     ]
-  ,
-    name: 'mkreadme'
-    label: 'Create readme file'
-    type: 'boolean'
-    default: true
   ,
     name: 'mklicense'
     label: 'Create license file'
@@ -93,6 +88,16 @@ module.exports =
     default: 'mocha'
     if: (answers) -> answers.testing
   ,
+    name: 'coverage'
+    label: 'Are you using code coverage'
+    type: 'boolean'
+  ,
+    name: 'testtool'
+    label: 'Which covering tool are you using?'
+    values: ['istanbul', 'jscoverage']
+    default: 'mocha'
+    if: (answers) -> answers.testing
+  ,
     name: 'dependencies'
     label: 'List of dependencies ("name[=version],...")'
   ,
@@ -105,5 +110,48 @@ module.exports =
     name: 'coffeescript'
     label: 'Are you planning to use coffescript'
     type: 'boolean'
-    default: false
+    default: true
+  ,
+    name: 'mksample'
+    label: 'Create a sample folder'
+    type: 'boolean'
+    default: true
+  ,
+    name: 'mksample_location'
+    label: 'Sample location'
+    default: './doc'
+  ,
+    name: 'travis'
+    label: 'Do you wish to test against travis?'
+    type: 'boolean'
+    default: true
+  ,
+    name: 'travis_nodejs_versions'
+    label: 'Wish NodeJs version for Travis'
+    default: '0.10.0, 0.11.0'
+  ,
+    name: 'doc'
+    label: 'Do you plan to write documentation?'
+    type: 'boolean'
+    default: true
+  ,
+    name: 'doc_type'
+    label: 'Inside a folder or a git branch?'
+    type: 'string'
+    values: ['folder', 'branch']
+    default: 'folder'
+    if: (answers) -> answers.git
+  ,
+    name: 'doc_folder'
+    label: 'Folder location'
+    type: 'string'
+    required: true
+    default: './doc'
+    if: (answers) -> answer.doc_type is 'folder' or not answers.git
+  ,
+    name: 'doc_branch'
+    label: 'Branch name'
+    type: 'string'
+    required: true
+    if: (answers) -> answer.doc_type is 'branch'
   ]
