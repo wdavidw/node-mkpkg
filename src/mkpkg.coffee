@@ -61,11 +61,13 @@ mkpkg = (options={}) ->
   @create = =>
     unless @questions
       @questions = qa options, (err, answers) ->
-        generate()
+        generate answers
     else
       @questions.ask()
-    generate = =>
+    generate = (answers) =>
+      return console.log answers
       dest = options.questions.location.value
+
       # Check if dir exists
       check = =>
         fs.stat dest, (err, stat) ->

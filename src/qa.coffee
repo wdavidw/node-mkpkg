@@ -146,14 +146,14 @@ QA::ask = (i) ->
           # Move back to origin position
           rl.moveCursor @options.interface.output, label.length - @options.required.length, -1
           # Wait a bit
-          setTimeout ->
+          setTimeout =>
             rl.moveCursor @options.interface.output, 0, 1
             @options.interface._deleteLineLeft()
             rl.moveCursor @options.interface.output, 0, -1
             @options.interface._deleteLineRight()
             ask()
           , @options.wait
-        return
+          return
       if question.type is 'boolean' and typeof answer isnt 'boolean'
         answer = answer.toLowerCase()
         switch

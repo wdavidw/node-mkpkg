@@ -25,6 +25,7 @@ module.exports =
   Let's create our new Node.js project.
   At any point in time, press [esc] to view the help.
   """
+  invalid: 'The format of this answer is invalid'
   required: 'This question is required, please answer it.'
   save_where: 'Where would you like to save your project definition?'
   save_successfull: 'Project definition was successfully written'
@@ -58,8 +59,9 @@ module.exports =
     label: 'GitHub URL'
     if: (answers) -> answers.git
     match: [
-      /\w+@github.com:(.*)\/(.*)\.git/
-      /\w+:\/\/github.com\/(.*)\/(.*)\.git/
+      /^\w+@github.com:(.*)\/(.*)\.git/
+      /^\w+:\/\/github.com\/(.*)\/(.*)\.git/
+      /^http:\/\/www\.github\.com/
     ]
   ,
     name: 'mklicense'
