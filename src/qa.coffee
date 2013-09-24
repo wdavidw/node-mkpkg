@@ -69,11 +69,11 @@ QA::end = (i) ->
   else
     @callback null, @answers
 
-QA::ask = (i) ->
+QA::ask = (index) ->
   @disabled = false
-  ask = =>
+  ask = () =>
     return if @disabled
-    @options.index = i if i?
+    @options.index = index if index?
     question = @options.questions[@options.index]
     return @end() unless question
     # Condition

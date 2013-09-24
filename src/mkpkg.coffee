@@ -1,5 +1,6 @@
 
 {EventEmitter} = require 'events'
+{exec} = require 'child_process'
 fs = require 'fs'
 rl = require 'readline'
 util = require 'util'
@@ -65,58 +66,110 @@ mkpkg = (options={}) ->
     else
       @questions.ask()
     generate = (answers) =>
-      return console.log answers
-      dest = options.questions.location.value
-
       # Check if dir exists
-      check = =>
-        fs.stat dest, (err, stat) ->
-          return mkdir() if err
+      do_check = =>
+        fs.stat answers.location, (err, stat) ->
+          return do_mkdir() if err
           options.interface.question "Do you wish to overwrite the directory [#{bold('yes')},no]", (answer) ->
             switch answer
-              when 'yes', 'y', '' then git()
+              when 'yes', 'y', '' then do_git()
               else save()
-      mkdir = =>
-        dest = options.questions.location.value
-        fs.mkdir dest, (err) ->
+      do_mkdir = =>
+        fs.mkdir answers.location, (err) ->
           return error err, true if err
-          git()
-      git = ->
-        fs.exists "#{dest}/.git", (exists) ->
+          do_git()
+      do_git = ->
+        fs.exists "#{answers.location}/.git", (exists) ->
           return gitignore() if exists
-          git = new Git dest
-          git.init {}, (err, git) ->
-            gitignore()
-      gitignore = ->
+          repository = require 'git/lib/git/repository'
+          # this generate a bare repository
+          # git = new Git answers.location
+          # git.init {bare: false, is_bare: false}, (err, git) ->
+          #   do_gitignore()
+          exec "cd #{answers.location} && git init", (err, stdout, stderr) ->
+            return next err if err
+            do_gitignore()
+      do_gitignore = ->
         content = """
         .*
         /node_modules
         !.travis.yml
         !.gitignore
         """
-        fs.writeFile "#{dest}/.gitignore", content, (err) ->
-          finish()
-      layout = ->
-        lib = ->
-          fs.mkdir "#{dest}/lib", (err) ->
-            src()
-        src = ->
-        return test() unless options.questions.coffeescript.value
-          fs.mkdir "#{dest}/src", (err) ->
-            test()
-        test = ->
-          fs.mkdir "#{dest}/test", (err) ->
-            packagedotjson()
-        lib()
-      packagedotjson = =>
-        dest = "#{options.questions.location.value}/package.json"
+        fs.writeFile "#{answers.location}/.gitignore", content, (err) ->
+          return next err if err
+          do_layout()
+      do_layout = ->
+        do_lib = ->
+          fs.mkdir "#{answers.location}/lib", (err) ->
+            fs.writeFile "#{answers.location}/lib/index.js", """
+
+            module.exports = function(callback) {
+              return process.setImmediate(function() {
+                return callback(null, 'Hello world');
+              });
+            };
+
+            """, (err) ->
+              return next err if err
+              do_src()
+        do_src = ->
+          return do_test() unless answers.coffeescript
+          fs.mkdir "#{answers.location}/src", (err) ->
+            fs.writeFile "#{answers.location}/src/index.coffee", """
+
+            module.exports = (callback) ->
+              process.setImmediate ->
+                callback null, 'Hello world'
+
+            """, (err) ->
+              return next err if err
+              do_test()
+        do_test = ->
+          fs.mkdir "#{answers.location}/test", (err) ->
+            env = answers.name.toUpperCase().replace '-', '_'
+            env = "#{env}_COV"
+            if answers.coffeescript
+              fs.writeFile "#{answers.location}/test/index.coffee", """
+              should = require 'should'
+              index = if process.env['#{env}'] then require '../lib-cov' else require '../lib'
+
+              describe '#{answers.name}', ->
+
+                it 'pass hello world', (next) ->
+                  index (err, value) ->
+                    return next err if err
+                    value.should.eql 'Hello world'
+                    next()
+              """, (err) ->
+            else
+              fs.writeFile "#{answers.location}/test/index.js", """
+              var should = require('should');
+              var index = process.env['#{env}'] ? require('../lib-cov') : require('../lib');
+
+              describe('#{answers.name}', function() {
+                return it('pass hello world', function(next) {
+                  return index(function(err, value) {
+                    if (err) {
+                      return next(err);
+                    }
+                    value.should.eql('Hello world');
+                    return next();
+                  });
+                });
+              });
+              """, (err) ->
+            do_packagedotjson()
+        do_lib()
+      do_packagedotjson = =>
+        dest = "#{answers.location}/package.json"
         content = {}
         # Project name
-        content.name = options.questions.name.value
+        content.name = answers.name
         # Repository
         # https://github.com/wdavidw/node-csv.git
         # git@github.com:wdavidw/node-csv.git
-        if options.questions.github
+        if answers.github
           if match = /\w+@github.com:(.*)\/(.*)\.git/ # SSH
             username = match[1]
             project = match[2]
@@ -125,33 +178,33 @@ mkpkg = (options={}) ->
             project = match[2]
           content.repository =
             type: 'git'
-            url: options.questions.github.value
+            url: answers.github
         # Dependencies
         content.dependencies = {}
-        dependencies = options.questions.dependencies.value
+        dependencies = answers.dependencies
         if dependencies isnt ''
-          for dep in options.questions.dependencies.value.split ','
+          for dep in answers.dependencies.split ','
             content.dependencies[dep] = 'latest'
         # Dev Dependencies
         content.devDependencies = {}
-        devDependencies = options.questions.devDependencies.value
+        devDependencies = answers.devDependencies
         if devDependencies isnt ''
-          for dep in options.questions.devDependencies.value.split ','
+          for dep in answers.devDependencies.split ','
             content.devDependencies[dep] = 'latest'
         # Optional Dependencies
         content.optionalDependencies = {}
-        optional_dependencies = options.questions.optionalDependencies.value
+        optional_dependencies = answers.optionalDependencies
         if optional_dependencies isnt ''
-          for dep in options.questions.optionalDependencies.value.split ','
+          for dep in answers.optionalDependencies.split ','
             content.optionalDependencies[dep] = 'latest'
         # Write
         content = JSON.stringify content, null, 4
         fs.writeFile dest, content, 'utf8', (err) ->
           return error err, true if err
-          git()
-      finish = =>
+          do_finish()
+      do_finish = =>
         @quit()
-      check()
+      do_check()
   @load = =>
     ask = =>
       options.interface.question 'Where is the project file? ', (answer) ->

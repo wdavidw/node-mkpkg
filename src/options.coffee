@@ -110,7 +110,7 @@ module.exports =
     label: 'List of optional dependencies ("name[=version],...")'
   ,
     name: 'coffeescript'
-    label: 'Are you planning to use coffescript'
+    label: 'Are you planning to use coffeescript'
     type: 'boolean'
     default: true
   ,
@@ -149,11 +149,11 @@ module.exports =
     type: 'string'
     required: true
     default: './doc'
-    if: (answers) -> answer.doc_type is 'folder' or not answers.git
+    if: (answers) -> answers.doc_type is 'folder' or not answers.git
   ,
     name: 'doc_branch'
     label: 'Branch name'
     type: 'string'
     required: true
-    if: (answers) -> answer.doc_type is 'branch'
+    if: (answers) -> answers.doc_type is 'branch'
   ]
