@@ -106,7 +106,6 @@ describe 'create', ->
       next err
 
   it 'init git and create an .gitignore file', (next) ->
-    @timeout 0
     test options, (err) ->
       fs.exists '/tmp/my-project', (exists) ->
         exists.should.be.ok
