@@ -1,6 +1,6 @@
 {
   "name": "mkpkg",
-  "version": "0.3.5",
+  "version": "0.0.1",
   "description": "Make new Node.js packages easy.",
   "homepage": "http://www.adaltas.com/projects/node-mkpkg/",
   "bugs": "https://github.com/wdavidw/node-mkpkg/issues",
