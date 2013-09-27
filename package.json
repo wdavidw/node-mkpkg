@@ -28,6 +28,9 @@
     "should": "latest"
   },
   "optionalDependencies": {},
+  "bin" : {
+    "mkpkg" : "./mkpkg"
+  },
   "scripts": {
     "test": "make test"
   }
