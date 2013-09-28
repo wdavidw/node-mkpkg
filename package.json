@@ -20,7 +20,8 @@
     "url": "git://github.com/wdavidw/node-mkpkg.git"
   },
   "dependencies": {
-    "git": "latest"
+    "git": "latest",
+    "pad": "latest"
   },
   "devDependencies": {
     "coffee-script": "latest",
