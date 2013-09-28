@@ -213,4 +213,23 @@ describe 'create', ->
         options[15] = staged
         next()
 
+  it 'generate a makefile with istanbul', (next) ->
+    test options, (err) ->
+      fs.readFile '/tmp/my-project/Makefile', 'ascii', (err, content) ->
+        return next err if err
+        content.should.eql """
+        build:
+          @./node_modules/.bin/coffee -b -o lib src/*.coffee
+
+        test: build
+          @NODE_ENV=test ./node_modules/.bin/mocha --compilers coffee:coffee-script \
+            --reporter dot
+
+        coverage: build
+          @istanbul cover _mocha -- -R spec --compilers coffee:coffee-script
+
+        .PHONY: test
+        """
+        next()
+
 

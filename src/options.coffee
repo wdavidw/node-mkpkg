@@ -84,7 +84,7 @@ module.exports =
     label: 'Are you testing your code'
     type: 'boolean'
   ,
-    name: 'testtool'
+    name: 'test_tool'
     label: 'Which testing tool are you using?'
     values: ['mocha', 'jasmine-node']
     default: 'mocha'
@@ -94,7 +94,7 @@ module.exports =
     label: 'Are you using code coverage'
     type: 'boolean'
   ,
-    name: 'testtool'
+    name: 'coverage_tool'
     label: 'Which covering tool are you using?'
     values: ['istanbul', 'jscoverage']
     default: 'mocha'

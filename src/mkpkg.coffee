@@ -81,7 +81,7 @@ mkpkg = (options={}) ->
       do_git = ->
         fs.exists "#{answers.location}/.git", (exists) ->
           return gitignore() if exists
-          repository = require 'git/lib/git/repository'
+          # repository = require 'git/lib/git/repository'
           # this generate a bare repository
           # git = new Git answers.location
           # git.init {bare: false, is_bare: false}, (err, git) ->
@@ -201,6 +201,33 @@ mkpkg = (options={}) ->
         content = JSON.stringify content, null, 4
         fs.writeFile dest, content, 'utf8', (err) ->
           return error err, true if err
+          do_makefile()
+      do_makefile = =>
+        content = []
+        if answers.coffeescript
+          content.push """
+          build:
+            @./node_modules/.bin/coffee -b -o lib src/*.coffee
+          """
+        if answers.test_tool is 'mocha'
+          compilers = if answers.coffeescript then '--compilers coffee:coffee-script ' else ''
+          content.push """
+          test: build
+            @NODE_ENV=test ./node_modules/.bin/mocha #{compilers}\
+              --reporter dot
+          """
+        if answers.coverage_tool is 'istanbul'
+          content.push """
+          coverage: build
+            @istanbul cover _mocha -- -R spec --compilers coffee:coffee-script
+          """
+        if answers.test_tool
+          content.push """
+          .PHONY: test
+          """
+        return do_finish() unless content.length
+        fs.writeFile "#{answers.location}/Makefile", content.join('\n\n'), 'utf8', (err) ->
+          return next err if err
           do_finish()
       do_finish = =>
         @quit()
