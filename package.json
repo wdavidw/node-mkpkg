@@ -29,8 +29,9 @@
     "should": "latest"
   },
   "optionalDependencies": {},
+  "preferGlobal": true,
   "bin" : {
-    "mkpkg" : "./mkpkg"
+    "mkpkg" : "./bin/mkpkg"
   },
   "scripts": {
     "test": "make test"
